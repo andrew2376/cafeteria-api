@@ -3,8 +3,9 @@ package co.edu.autonoma.cafeteriaapi.controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import co.edu.autonoma.reservasapi.dto.EstadoResponse;
-import co.edu.autonoma.reservasapi.service.EstadoService;
+
+import co.edu.autonoma.cafeteriaapi.dto.EstadoResponse;
+import co.edu.autonoma.cafeteriaapi.service.EstadoService;
 
 @RestController
 @RequestMapping("/api/estado")
