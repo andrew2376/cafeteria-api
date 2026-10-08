@@ -1,4 +1,4 @@
-package co.edu.autonoma.cafeteriaapi.domain;
+package co.edu.autonoma.cafeteriaapi.entity;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
