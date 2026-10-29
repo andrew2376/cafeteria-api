@@ -6,6 +6,7 @@ import co.edu.autonoma.cafeteriaapi.dto.ProductoMenuResponse;
 import co.edu.autonoma.cafeteriaapi.service.ProductoMenuService;
 
 import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
@@ -14,14 +15,10 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api")
+@RequiredArgsConstructor
 public class ProductoMenuController {
 
     private final ProductoMenuService productoMenuService;
-
-    public ProductoMenuController(
-            ProductoMenuService productoMenuService) {
-        this.productoMenuService = productoMenuService;
-    }
 
     @GetMapping("/menu")
     public List<ProductoMenuResponse> obtenerMenu() {
@@ -34,8 +31,7 @@ public class ProductoMenuController {
     }
 
     @GetMapping("/productos-menu/{id}")
-    public ProductoMenuResponse obtenerPorId(
-            @PathVariable Long id) {
+    public ProductoMenuResponse obtenerPorId(@PathVariable Long id) {
         return productoMenuService.obtenerPorId(id);
     }
 

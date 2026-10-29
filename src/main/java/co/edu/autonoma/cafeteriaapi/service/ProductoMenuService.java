@@ -6,6 +6,8 @@ import co.edu.autonoma.cafeteriaapi.dto.ProductoMenuResponse;
 import co.edu.autonoma.cafeteriaapi.entity.ProductoMenuEntity;
 import co.edu.autonoma.cafeteriaapi.repository.ProductoMenuRepository;
 
+import lombok.RequiredArgsConstructor;
+
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -14,14 +16,10 @@ import org.springframework.web.server.ResponseStatusException;
 import java.util.List;
 
 @Service
+@RequiredArgsConstructor
 public class ProductoMenuService {
 
     private final ProductoMenuRepository productoMenuRepository;
-
-    public ProductoMenuService(
-            ProductoMenuRepository productoMenuRepository) {
-        this.productoMenuRepository = productoMenuRepository;
-    }
 
     // Consultar todos los productos registrados.
     @Transactional(readOnly = true)
@@ -106,7 +104,6 @@ public class ProductoMenuService {
                 ));
     }
 
-    // Convertir la entidad en el DTO de respuesta.
     private ProductoMenuResponse convertirAResponse(
             ProductoMenuEntity producto) {
 
