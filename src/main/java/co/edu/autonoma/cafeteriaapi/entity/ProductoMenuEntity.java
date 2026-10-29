@@ -1,3 +1,4 @@
+
 package co.edu.autonoma.cafeteriaapi.entity;
 
 import jakarta.persistence.Column;
@@ -6,9 +7,16 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
+import lombok.AccessLevel;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+
+import java.math.BigDecimal;
 
 @Entity
 @Table(name = "productos_menu")
+@Getter
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class ProductoMenuEntity {
 
     @Id
@@ -18,43 +26,27 @@ public class ProductoMenuEntity {
     @Column(nullable = false)
     private String nombre;
 
-    @Column(nullable = false)
-    private Double precio;
+    @Column(nullable = false, precision = 10, scale = 2)
+    private BigDecimal precio;
 
     @Column(nullable = false)
     private Boolean disponible;
 
-    public ProductoMenuEntity() {
-    }
-
-    public ProductoMenuEntity(String nombre, Double precio, Boolean disponible) {
+    public ProductoMenuEntity(
+            String nombre,
+            BigDecimal precio,
+            Boolean disponible) {
         this.nombre = nombre;
         this.precio = precio;
         this.disponible = disponible;
-    }
-
-    public Long getId() {
-        return id;
-    }
-
-    public String getNombre() {
-        return nombre;
     }
 
     public void setNombre(String nombre) {
         this.nombre = nombre;
     }
 
-    public Double getPrecio() {
-        return precio;
-    }
-
-    public void setPrecio(Double precio) {
+    public void setPrecio(BigDecimal precio) {
         this.precio = precio;
-    }
-
-    public Boolean getDisponible() {
-        return disponible;
     }
 
     public void setDisponible(Boolean disponible) {
