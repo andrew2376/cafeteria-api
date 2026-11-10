@@ -91,6 +91,16 @@ public class ProductoMenuService {
         return convertirAResponse(actualizado);
     }
 
+    // YUL-02: Eliminación lógica de un producto.
+    public void eliminar(Long id) {
+
+        ProductoMenuEntity producto = buscarProducto(id);
+
+        producto.setDisponible(false);
+
+        productoMenuRepository.save(producto);
+    }
+
     // Buscar un producto y generar error 404 si no existe.
     private ProductoMenuEntity buscarProducto(Long id) {
         return productoMenuRepository.findById(id)

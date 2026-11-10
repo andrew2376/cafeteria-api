@@ -86,4 +86,13 @@ public class ProductoMenuController {
                 )
         );
     }
+
+    // YUL-02: Eliminación lógica de un producto.
+    @DeleteMapping("/productos-menu/{id}")
+    public ResponseEntity<Void> eliminar(@PathVariable Long id) {
+
+        productoMenuService.eliminar(id);
+
+        return ResponseEntity.noContent().build();
+    }
 }
