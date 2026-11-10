@@ -1,3 +1,4 @@
+
 package co.edu.autonoma.cafeteriaapi.service;
 
 import co.edu.autonoma.cafeteriaapi.dto.PedidoRequest;
@@ -6,6 +7,7 @@ import co.edu.autonoma.cafeteriaapi.entity.EstadoPedido;
 import co.edu.autonoma.cafeteriaapi.entity.ItemPedidoEntity;
 import co.edu.autonoma.cafeteriaapi.entity.PedidoEntity;
 import co.edu.autonoma.cafeteriaapi.entity.ProductoMenuEntity;
+import co.edu.autonoma.cafeteriaapi.repository.ItemPedidoRepository;
 import co.edu.autonoma.cafeteriaapi.repository.PedidoRepository;
 import co.edu.autonoma.cafeteriaapi.repository.ProductoMenuRepository;
 
@@ -25,6 +27,7 @@ public class PedidoService {
 
     private final PedidoRepository pedidoRepository;
     private final ProductoMenuRepository productoMenuRepository;
+    private final ItemPedidoRepository itemPedidoRepository;
 
     @Transactional
     public PedidoResponse crear(PedidoRequest request) {
@@ -92,10 +95,62 @@ public class PedidoService {
             );
         }
 
+        validarTransicion(pedido.getEstado(), nuevoEstado);
+
         pedido.cambiarEstado(nuevoEstado);
 
         PedidoEntity actualizado = pedidoRepository.save(pedido);
         return convertirAResponse(actualizado);
+    }
+
+    @Transactional
+    public void eliminarItem(Long id) {
+        ItemPedidoEntity item = itemPedidoRepository.findById(id)
+                .orElseThrow(() -> new ResponseStatusException(
+                        HttpStatus.NOT_FOUND,
+                        "No se encontró el ítem con ID: " + id
+                ));
+
+        PedidoEntity pedido = item.getPedido();
+
+        if (pedido.getEstado() != EstadoPedido.RECIBIDO) {
+            throw new ResponseStatusException(
+                    HttpStatus.BAD_REQUEST,
+                    "Solo se pueden eliminar ítems de pedidos en estado RECIBIDO"
+            );
+        }
+
+        if (pedido.getItems().size() <= 1) {
+            throw new ResponseStatusException(
+                    HttpStatus.BAD_REQUEST,
+                    "No se puede eliminar el último ítem del pedido"
+            );
+        }
+
+        pedido.retirarItem(item);
+        pedidoRepository.save(pedido);
+    }
+
+    private void validarTransicion(
+            EstadoPedido estadoActual,
+            EstadoPedido nuevoEstado
+    ) {
+        EstadoPedido siguienteEstado = switch (estadoActual) {
+            case RECIBIDO -> EstadoPedido.PREPARANDO;
+            case PREPARANDO -> EstadoPedido.LISTO;
+            case LISTO -> EstadoPedido.ENTREGADO;
+            case ENTREGADO -> null;
+        };
+
+        if (nuevoEstado != siguienteEstado) {
+            throw new ResponseStatusException(
+                    HttpStatus.BAD_REQUEST,
+                    "Transición de estado no permitida. "
+                            + "Estado actual: " + estadoActual
+                            + ". Siguiente estado permitido: "
+                            + siguienteEstado
+            );
+        }
     }
 
     private PedidoEntity buscarPedido(Long id) {
