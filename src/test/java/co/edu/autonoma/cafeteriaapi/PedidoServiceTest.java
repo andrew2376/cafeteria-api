@@ -1,6 +1,7 @@
 
 package co.edu.autonoma.cafeteriaapi.service;
 
+import co.edu.autonoma.cafeteriaapi.dto.PedidoResponse;
 import co.edu.autonoma.cafeteriaapi.entity.EstadoPedido;
 import co.edu.autonoma.cafeteriaapi.entity.ItemPedidoEntity;
 import co.edu.autonoma.cafeteriaapi.entity.PedidoEntity;
@@ -15,8 +16,11 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import org.springframework.http.HttpStatus;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -203,6 +207,55 @@ class PedidoServiceTest {
         );
 
         assertEquals(404, exception.getStatusCode().value());
+        verify(pedidoRepository, never()).save(any());
+    }
+
+    // CONSULTA DE PEDIDOS POR ID
+
+    @Test
+    void debeObtenerPedidoPorIdCorrectamente() {
+        Long id = 1L;
+
+        PedidoEntity pedido = mock(PedidoEntity.class);
+
+        when(pedidoRepository.findById(id))
+                .thenReturn(Optional.of(pedido));
+
+        when(pedido.getId()).thenReturn(id);
+        when(pedido.getFechaCreacion()).thenReturn(LocalDateTime.now());
+        when(pedido.getEstado()).thenReturn(EstadoPedido.RECIBIDO);
+        when(pedido.getTotal()).thenReturn(new BigDecimal("15000"));
+        when(pedido.getItems()).thenReturn(List.of());
+
+        PedidoResponse response = pedidoService.obtenerPorId(id);
+
+        assertNotNull(response);
+        assertEquals(id, response.id());
+        assertEquals(EstadoPedido.RECIBIDO, response.estado());
+        assertEquals(
+                0,
+                new BigDecimal("15000").compareTo(response.total())
+        );
+        assertTrue(response.items().isEmpty());
+
+        verify(pedidoRepository).findById(id);
+    }
+
+    @Test
+    void debeRetornarErrorCuandoElPedidoNoExiste() {
+        Long id = 999L;
+
+        when(pedidoRepository.findById(id))
+                .thenReturn(Optional.empty());
+
+        ResponseStatusException exception = assertThrows(
+                ResponseStatusException.class,
+                () -> pedidoService.obtenerPorId(id)
+        );
+
+        assertEquals(HttpStatus.NOT_FOUND, exception.getStatusCode());
+
+        verify(pedidoRepository).findById(id);
         verify(pedidoRepository, never()).save(any());
     }
 }
